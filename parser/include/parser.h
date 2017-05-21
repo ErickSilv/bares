@@ -33,6 +33,7 @@ class Parser
                     UNEXPECTED_END_OF_EXPRESSION,
                     ILL_FORMED_INTEGER,
                     MISSING_TERM,
+                    MISSING_CLOSING_PARENTHESIS,
                     EXTRANEOUS_SYMBOL,
                     INTEGER_OUT_OF_RANGE
             };
@@ -80,6 +81,8 @@ class Parser
             TS_EXPO,            //<! "^"
             TS_ZERO,            //<! "0"
             TS_NON_ZERO_DIGIT,  //<! "1"->"9"
+            TS_OPENING_SCOPE    //<! "("
+            TS_CLOSING_SCOPE    //<! ")"
             TS_WS,              //<! white-space
             TS_TAB,             //<! tab
             TS_EOS,             //<! End Of String

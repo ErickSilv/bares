@@ -188,20 +188,6 @@ Parser::ParserResult Parser::expression()
             // Token( "/", OPERATOR )
             token_list.push_back( Token("^", Token::token_t::OPERATOR) );
         }
-        else if ( expect( terminal_symbol_t::TS_ZERO ) )
-        {
-            //Ok, recebemos:
-            //Token( "0", OPERAND )
-            token_list.push_back( Token("0", Token::token_t::OPERAND) );
-        }
-        else if ( expect( terminal_symbol_t::TS_NON_ZERO_DIGIT ) )
-        {
-            //Ok, recebemos:
-            //Token( "1->9", OPERAND )
-            auto result = term();
-            token_list.push_back( Token( result, OPERAND ) )
-
-        }
         // ... se não for =/-, quer dizer que a expressão acabou.
         else return result;
 
@@ -226,11 +212,50 @@ Parser::ParserResult Parser::expression()
 Parser::ParserResult Parser::term()
 {
     skip_ws();
-    auto begin_token( it_curr_symb ); // Guardar o início da string do token.
-    auto result = integer();
+    std::string::iterator begin_token =  it_curr_symb;
 
-    // TODO: Capturar o Token( [begin_token, it_curr_symbol), OPERAND )
-    
+    Parser::ParserResult result = Parser::ParserResult( Result::MISSING_TERM, std::distance( expr.begin(), it_curr_symb) );
+    //Pode vir um "("
+    if( expect( terminal_symbol_t::TS_OPENING_SCOPE) )
+    {
+        token_list.push_back( 
+        Token( token_str(terminal_symbol_t::TS_OPENING_SCOPE), Token::token_t::OPENING_SCOPE));
+        result = expression();
+        //result = Result( Result::OK, std::distance( expr.begin(), it_curr_symb) );
+        if(result.type == Result::PARSER_OK){
+            if( not expect(terminal_symbol_t::TS_CLOSING_SCOPE) )
+                return Parser::ParserResult( Result::MISSING_CLOSING_PARENTHESIS, std::distance( expr.begin(), it_curr_symb) );
+            //Se for ")", adiciona à lista de tokens
+            token_list.push_back( 
+                           Token( token_str(terminal_symbol_t::TS_CLOSING_SCOPE), Token::token_t::CLOSING_SCOPE));
+        }
+    } 
+    else{
+        result =  integer();
+
+        std::string num;
+        num.insert(num.begin(), it_begin, it_curr_symb);
+
+        if( result.type == Result::PARSER_OK ){
+            std::string num;
+            num.insert(num.begin(), it_begin, it_curr_symb);
+
+            //Testa se num está no limite de required_int_type
+            input_int_type value = std::stoll(num);
+            if( value <= std::numeric_limits< Tokenizer::required_int_type >::max() 
+                and value >= std::numeric_limits< Tokenizer::required_int_type >::min()){
+
+                token_list.push_back( 
+                           Token( num, Token::token_t::OPERAND ) );
+                
+            } else{
+                result.type = Result::INTEGER_OUT_OF_RANGE;
+                result.at_col = std::distance( expr.begin(), it_begin);
+            }
+        }
+    }
+  
+
     return result;
 }
 
