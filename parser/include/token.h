@@ -10,8 +10,10 @@ struct Token
     public:
         enum class token_t : int
         {
-            OPERAND = 0, // Basically numbers.
-            OPERATOR     // "+", "-".
+            OPERAND = 0,    // Basically numbers.
+            OPERATOR,       // "+", "-", "*", "/", "^".
+            OPENING_SCOPE,  // "(".
+            CLOSING_SCOPE,  // ")".
         };
 
         std::string value; //<! The original token value.
