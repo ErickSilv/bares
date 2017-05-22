@@ -7,7 +7,7 @@
 std::vector<std::string> expressions =
 {
     "10^2",
-    "    1202    +    40 + 8",
+    "    (1202    +    40) * 8",
     "32767 - 32768 + 3",
     "58 * 32766",
     "5 / -32768",
@@ -40,6 +40,8 @@ void print_msg( const Parser::ParserResult & result, std::string str )
         case Parser::ParserResult::EXTRANEOUS_SYMBOL:
             std::cout << ">>> Extraneous symbol after valid expression found at column (" << result.at_col << ")!\n";
             break;
+        case Parser::ParserResult::MISSING_CLOSING_PARENTHESIS:
+            std::cout << ">>> Missing closing \")\" at column (" << result.at_col << ")!\n";
         case Parser::ParserResult::INTEGER_OUT_OF_RANGE:
             std::cout << ">>> Integer constant out of range beginning at column (" << result.at_col << ")!\n";
             break;

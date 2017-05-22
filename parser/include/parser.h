@@ -79,6 +79,7 @@ class Parser
             TS_DIV,             //<! "/"
             TS_MULT,            //<! "*"
             TS_EXPO,            //<! "^"
+            TS_MOD,             //<! "%"
             TS_ZERO,            //<! "0"
             TS_NON_ZERO_DIGIT,  //<! "1"->"9"
             TS_OPENING_SCOPE,   //<! "("

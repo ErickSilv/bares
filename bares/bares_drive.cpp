@@ -193,7 +193,7 @@ value_type evaluate_postfix( std::string postfix_ )
 
     for( auto ch : postfix_ )
     {
-        if ( is_operand(ch ) )
+        if ( is_operand( ch ) )
         {
             s.push( char2integer(ch) );
         }

@@ -43,6 +43,8 @@ std::string Parser::token_str( terminal_symbol_t s_ ) const
         case terminal_symbol_t::TS_EXPO   : return "^";
         case terminal_symbol_t::TS_MULT   : return "*";
         case terminal_symbol_t::TS_DIV    : return "/";
+        case terminal_symbol_t::TS_OPENING_SCOPE: return "(";
+        case terminal_symbol_t::TS_CLOSING_SCOPE: return ")";
         case terminal_symbol_t::TS_WS     : return " ";
         case terminal_symbol_t::TS_ZERO   : return "0";
         default                           : return "X";
@@ -190,6 +192,12 @@ Parser::ParserResult Parser::expression()
             // Token( "/", OPERATOR )
             token_list.push_back( Token("/", Token::token_t::OPERATOR) );
         }
+        else if ( expect( terminal_symbol_t::TS_MOD ) )
+        {
+            // Ok, recebemos:
+            // Token( "/", OPERATOR )
+            token_list.push_back( Token("%", Token::token_t::OPERATOR) );
+        }
         // ... se não for OPERATOR, quer dizer que a expressão acabou.
         else return result;
 
@@ -217,12 +225,13 @@ Parser::ParserResult Parser::term()
     skip_ws();
     std::string::iterator begin_token =  it_curr_symb;
 
-    Parser::ParserResult result = Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(), it_curr_symb) );
+    Parser::ParserResult result = Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(), it_curr_symb+1) );
     //Pode vir um "("
     if( expect( terminal_symbol_t::TS_OPENING_SCOPE ) )
     {
+        std::cout << "achou carai" << std::endl;
         token_list.push_back( 
-                        Token( "(", Token::token_t::OPENING_SCOPE) );
+                         Token( token_str(terminal_symbol_t::TS_OPENING_SCOPE), Token::token_t::OPENING_SCOPE) );
         result = expression();
         
         //result = Result( ParserResult::PARSER_OK, std::distance( expr.begin(), it_curr_symb) );
@@ -231,7 +240,7 @@ Parser::ParserResult Parser::term()
                 return Parser::ParserResult( ParserResult::MISSING_CLOSING_PARENTHESIS, std::distance( expr.begin(), it_curr_symb) );
             //Se for ")", adiciona à lista de tokens
             token_list.push_back( 
-                           Token( ")", Token::token_t::CLOSING_SCOPE ) );
+                           Token( token_str(terminal_symbol_t::TS_CLOSING_SCOPE), Token::token_t::CLOSING_SCOPE ) );
         }
     } 
     else
@@ -239,7 +248,7 @@ Parser::ParserResult Parser::term()
         result =  integer();
 
         std::string num;
-        num.insert( num.begin(), begin_token, it_curr_symb );
+        num.insert( num.begin(), begin_token+result.at_col, it_curr_symb );
 
         if( result.type == ParserResult::PARSER_OK ){
             std::string num;
