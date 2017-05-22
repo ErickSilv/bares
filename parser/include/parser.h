@@ -50,7 +50,7 @@ class Parser
         };
 
         //==== Aliases
-        typedef short int required_int_type;
+        typedef long int required_int_type;
         typedef long long int input_int_type;
 
         //==== Public interface

@@ -190,11 +190,11 @@ Parser::ParserResult Parser::expression()
             // Token( "/", OPERATOR )
             token_list.push_back( Token("/", Token::token_t::OPERATOR) );
         }
-        // ... se não for =/-, quer dizer que a expressão acabou.
+        // ... se não for OPERATOR, quer dizer que a expressão acabou.
         else return result;
 
-        // (4) Se chegamos aqui é porque recebemos com sucesso um "+"
-        // ou um "-". Então agora TEM QUE VIR UM TERMO!.
+        // (4) Se chegamos aqui é porque recebemos com sucesso um
+        // OPERATOR. Então agora TEM QUE VIR UM TERMO!.
         // Se não vier um termo, então temos um erro de sintaxe.
 
         result = term(); // consumir um termo da entrada (expressão).
@@ -219,12 +219,13 @@ Parser::ParserResult Parser::term()
 
     Parser::ParserResult result = Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(), it_curr_symb) );
     //Pode vir um "("
-    if( expect( terminal_symbol_t::TS_OPENING_SCOPE) )
+    if( expect( terminal_symbol_t::TS_OPENING_SCOPE ) )
     {
         token_list.push_back( 
-        Token(  "(", Token::token_t::OPENING_SCOPE ) );
+                        Token( "(", Token::token_t::OPENING_SCOPE) );
         result = expression();
-        //result = Result( code_t::PARSER_OK, std::distance( expr.begin(), it_curr_symb) );
+        
+        //result = Result( ParserResult::PARSER_OK, std::distance( expr.begin(), it_curr_symb) );
         if(result.type == ParserResult::PARSER_OK){
             if( not expect(terminal_symbol_t::TS_CLOSING_SCOPE) )
                 return Parser::ParserResult( ParserResult::MISSING_CLOSING_PARENTHESIS, std::distance( expr.begin(), it_curr_symb) );
@@ -233,25 +234,26 @@ Parser::ParserResult Parser::term()
                            Token( ")", Token::token_t::CLOSING_SCOPE ) );
         }
     } 
-    else{
+    else
+    {
         result =  integer();
 
         std::string num;
-        num.insert(num.begin(), begin_token, it_curr_symb);
+        num.insert( num.begin(), begin_token, it_curr_symb );
 
         if( result.type == ParserResult::PARSER_OK ){
             std::string num;
             num.insert(num.begin(), begin_token, it_curr_symb);
 
             //Testa se num está no limite de required_int_type
-            input_int_type value = std::stoll(num);
+            input_int_type value = std::stoll( num );
             if( value <= std::numeric_limits< Parser::required_int_type >::max() 
-                and value >= std::numeric_limits< Parser::required_int_type >::min()){
+                and value >= std::numeric_limits< Parser::required_int_type >::min() ){
 
                 token_list.push_back( 
                            Token( num, Token::token_t::OPERAND ) );
                 
-            } else{
+            } else {
                 result.type = ParserResult::INTEGER_OUT_OF_RANGE;
                 result.at_col = std::distance( expr.begin(), begin_token );
             }

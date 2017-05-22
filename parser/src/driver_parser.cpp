@@ -10,14 +10,14 @@ std::vector<std::string> expressions =
     "    1202    +    40 + 8",
     "32767 - 32768 + 3",
     "58 * 32766",
-    "5 / -32769",
+    "5 / -32768",
     "12 + 3",
     "-3+-5+-6",
     "12 + 3     -3 + -34 ",
     "+12",
     "1 + 3 * 4",
     "a + 4",
-    "       "
+    "(2+2-7)"
 };
 
 void print_msg( const Parser::ParserResult & result, std::string str )

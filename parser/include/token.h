@@ -13,7 +13,7 @@ struct Token
             OPERAND = 0,    // Basically numbers.
             OPERATOR,       // "+", "-", "*", "/", "^".
             OPENING_SCOPE,  // "(".
-            CLOSING_SCOPE,  // ")".
+            CLOSING_SCOPE   // ")".
         };
 
         std::string value; //<! The original token value.
