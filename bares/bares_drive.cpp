@@ -42,9 +42,8 @@ value_type evaluate_postfix( std::string );
 int main()
 {
     std::string expression = "4/(5^2)+(6^2^3)";
-    std::string expression2 = "1+ 3 * ( 4 + 80 * 30 ^70)";
+    std::string expression2 = "1+ 3 * ( 4 + 8 * 3^7)";
     //std::string expression = "A+(B*C-(D/E^F)+G)*H";
-    //
     auto postfix = infix_to_postfix(expression2);
     std::cout << ">>> Input (infix)    = " << expression2 << "\n";
     std::cout << ">>> Output (postfix) = " << postfix << "\n";

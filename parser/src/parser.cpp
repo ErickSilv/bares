@@ -12,6 +12,7 @@ Parser::terminal_symbol_t  Parser::lexer( char c_ ) const
         case '^':  return terminal_symbol_t::TS_EXPO;
         case '*':  return terminal_symbol_t::TS_MULT;
         case '/':  return terminal_symbol_t::TS_DIV;
+        case '%':  return terminal_symbol_t::TS_MOD;
         case '(':  return terminal_symbol_t::TS_OPENING_SCOPE;
         case ')':  return terminal_symbol_t::TS_CLOSING_SCOPE;
         case ' ':  return terminal_symbol_t::TS_WS;
@@ -38,16 +39,17 @@ std::string Parser::token_str( terminal_symbol_t s_ ) const
     switch( s_ )
     {
 
-        case terminal_symbol_t::TS_PLUS   : return "+";
-        case terminal_symbol_t::TS_MINUS  : return "-";
-        case terminal_symbol_t::TS_EXPO   : return "^";
-        case terminal_symbol_t::TS_MULT   : return "*";
-        case terminal_symbol_t::TS_DIV    : return "/";
+        case terminal_symbol_t::TS_PLUS         : return "+";
+        case terminal_symbol_t::TS_MINUS        : return "-";
+        case terminal_symbol_t::TS_EXPO         : return "^";
+        case terminal_symbol_t::TS_MULT         : return "*";
+        case terminal_symbol_t::TS_DIV          : return "/";
+        case terminal_symbol_t::TS_MOD          : return "%";
         case terminal_symbol_t::TS_OPENING_SCOPE: return "(";
         case terminal_symbol_t::TS_CLOSING_SCOPE: return ")";
-        case terminal_symbol_t::TS_WS     : return " ";
-        case terminal_symbol_t::TS_ZERO   : return "0";
-        default                           : return "X";
+        case terminal_symbol_t::TS_WS           : return " ";
+        case terminal_symbol_t::TS_ZERO         : return "0";
+        default                                 : return "X";
     }
 }
 
@@ -165,38 +167,38 @@ Parser::ParserResult Parser::expression()
         {
             // Ok, recebemos:
             // Token( "+", OPERATOR )
-            token_list.push_back( Token("+", Token::token_t::OPERATOR) );
+            token_list.push_back( Token( token_str(terminal_symbol_t::TS_PLUS), Token::token_t::OPERATOR) );
         }
         // (3) ... mas pode vir um '-', ou seja, também "esperamos" um '-'.
         else if ( expect( terminal_symbol_t::TS_MINUS ) ) // ou um '-'
         {
             // Ok, recebemos:
             // Token( "-", OPERATOR )
-            token_list.push_back( Token("-", Token::token_t::OPERATOR) );
+            token_list.push_back( Token(token_str(terminal_symbol_t::TS_MINUS), Token::token_t::OPERATOR) );
         }
         else if ( expect( terminal_symbol_t::TS_EXPO ) )
         {
             // Ok, recebemos:
             // Token( "^", OPERATOR )
-            token_list.push_back( Token("^", Token::token_t::OPERATOR) );
+            token_list.push_back( Token(token_str(terminal_symbol_t::TS_EXPO), Token::token_t::OPERATOR) );
         }
         else if ( expect( terminal_symbol_t::TS_MULT ) )
         {
             // Ok, recebemos:
             //Token( "*", OPERATOR )
-            token_list.push_back( Token("*", Token::token_t::OPERATOR) );
+            token_list.push_back( Token(token_str(terminal_symbol_t::TS_MULT), Token::token_t::OPERATOR) );
         }
         else if ( expect( terminal_symbol_t::TS_DIV ) )
         {
             // Ok, recebemos:
             // Token( "/", OPERATOR )
-            token_list.push_back( Token("/", Token::token_t::OPERATOR) );
+            token_list.push_back( Token(token_str(terminal_symbol_t::TS_DIV), Token::token_t::OPERATOR) );
         }
         else if ( expect( terminal_symbol_t::TS_MOD ) )
         {
             // Ok, recebemos:
             // Token( "/", OPERATOR )
-            token_list.push_back( Token("%", Token::token_t::OPERATOR) );
+            token_list.push_back( Token(token_str(terminal_symbol_t::TS_MOD), Token::token_t::OPERATOR) );
         }
         // ... se não for OPERATOR, quer dizer que a expressão acabou.
         else return result;
@@ -206,13 +208,12 @@ Parser::ParserResult Parser::expression()
         // Se não vier um termo, então temos um erro de sintaxe.
 
         result = term(); // consumir um termo da entrada (expressão).
-        if ( result.type != ParserResult::PARSER_OK ) // deu pau, não veio um termo.
+        if ( result.type != ParserResult::PARSER_OK and end_input() ) // deu pau, não veio um termo.
         {
             // Se o termo não foi encontrado, atualizamos a mensagem
             // de erro (ParserResult) recebida com um tipo mais
             // explicativo para o cliente.
-            result.type = ParserResult::MISSING_TERM;
-            return result;
+            return Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(),expr.end() ) );
         }
 
     }
@@ -225,11 +226,16 @@ Parser::ParserResult Parser::term()
     skip_ws();
     std::string::iterator begin_token =  it_curr_symb;
 
-    Parser::ParserResult result = Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(), it_curr_symb+1) );
-    //Pode vir um "("
-    if( expect( terminal_symbol_t::TS_OPENING_SCOPE ) )
+    Parser::ParserResult result = Parser::ParserResult( ParserResult::MISSING_TERM, std::distance( expr.begin(), it_curr_symb) );
+    
+    //Se chegar ao final da expressao e não achar nenhum termo
+    if ( end_input() )
     {
-        std::cout << "achou carai" << std::endl;
+        return Parser::ParserResult( ParserResult::MISSING_TERM, std::distance (  expr.begin(), expr.end() ) );
+    }   
+    //Pode vir um "("
+    else if( expect( terminal_symbol_t::TS_OPENING_SCOPE ) )
+    {
         token_list.push_back( 
                          Token( token_str(terminal_symbol_t::TS_OPENING_SCOPE), Token::token_t::OPENING_SCOPE) );
         result = expression();
@@ -245,10 +251,10 @@ Parser::ParserResult Parser::term()
     } 
     else
     {
-        result =  integer();
+        result = integer();
 
         std::string num;
-        num.insert( num.begin(), begin_token+result.at_col, it_curr_symb );
+        num.insert( num.begin(), begin_token, it_curr_symb );
 
         if( result.type == ParserResult::PARSER_OK ){
             std::string num;
@@ -348,7 +354,15 @@ Parser::parse( std::string e_ )
         std::copy( it_curr_symb, expr.end(), 
                 std::ostream_iterator<char>( std::cout, "" ) );
         std::cout << "\"\n";
-        if ( not end_input() )
+
+    } else {
+        if ( it_curr_symb == expr.begin() )
+        {
+            std::cout << "Erro aqui\n";
+            return ParserResult( ParserResult::ILL_FORMED_INTEGER, 
+                    std::distance( expr.begin(), it_curr_symb ) );
+        }
+        else if ( not end_input() )
         {
             std::cout << "Erro aqui\n";
             return ParserResult( ParserResult::EXTRANEOUS_SYMBOL, 

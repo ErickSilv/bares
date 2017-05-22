@@ -15,9 +15,12 @@ std::vector<std::string> expressions =
     "-3+-5+-6",
     "12 + 3     -3 + -34 ",
     "+12",
-    "1 + 3 * 4",
+    "1 % 3 * 4",
     "a + 4",
-    "(2+2-7)"
+    "(2+2-7",
+    "2 + a",
+    "3 / ",
+    "3 +    +"
 };
 
 void print_msg( const Parser::ParserResult & result, std::string str )
@@ -41,7 +44,8 @@ void print_msg( const Parser::ParserResult & result, std::string str )
             std::cout << ">>> Extraneous symbol after valid expression found at column (" << result.at_col << ")!\n";
             break;
         case Parser::ParserResult::MISSING_CLOSING_PARENTHESIS:
-            std::cout << ">>> Missing closing \")\" at column (" << result.at_col << ")!\n";
+            std::cout << ">>> Missing closing parenthesis \")\" at column (" << result.at_col << ")!\n";
+            break;
         case Parser::ParserResult::INTEGER_OUT_OF_RANGE:
             std::cout << ">>> Integer constant out of range beginning at column (" << result.at_col << ")!\n";
             break;
