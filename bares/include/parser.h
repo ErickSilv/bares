@@ -11,7 +11,7 @@
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.
  *
- *   <expr>            := <term>,{ ("+"|"-"),<term> };
+ *   <expr>            := <term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term> };
  *   <term>            := <integer>;
  *   <integer>         := 0 | ["-"],<natural_number>;
  *   <natural_number>  := <digit_excl_zero>,{<digit>};
@@ -52,7 +52,6 @@ class Parser
         //==== Aliases
         typedef long int required_int_type;
         typedef long long int input_int_type;
-
         //==== Public interface
         /// Recebe uma expressão, realiza o parsing e retorna o resultado.
         ParserResult parse( std::string e_ );
@@ -63,9 +62,13 @@ class Parser
         /// Constutor default.
         Parser() = default;
         ~Parser() = default;
+        
         /// Desligar cópia e atribuição.
         Parser( const Parser & ) = delete;  // Construtor cópia.
         Parser & operator=( const Parser & ) = delete; // Atribuição.
+
+        //Prints a result of expression's parsing.
+        void print_msg( const Parser::ParserResult & result, std::string str );
 
     private:
         //=== Aliases
@@ -94,9 +97,6 @@ class Parser
         std::string expr;                //<! The expression to be parsed
         std::string::iterator it_curr_symb; //<! Pointer to the current char inside the expression.
         std::vector< Token > token_list; //<! Resulting list of tokens extracted from the expression.
-
-        //Prints a result of expression's parsing.
-        void print_msg( const Parser::ParserResult & result, std::string str );
         
         /// Converte de caractere para código do símbolo terminal.
         terminal_symbol_t lexer( char ) const;

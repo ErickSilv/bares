@@ -1,30 +1,11 @@
 /*!
  * Infix to postfix conversion in C++
  * Input Postfix expression must be in a desired format.
- * Operands and operator, **both must be single character**.
+ * Operands and operator.
  * Only '+', '-', '*', '%', '/', and '^' (for exponentiation) operators are expected;
  * Any other character is just ignored.
  */
 #include "../include/bares.h"
-
-int main()
-{
-    std::vector<Token> expression_t = { Token("40", Token::token_t::OPERAND), Token("+", Token::token_t::OPERATOR), Token("37", Token::token_t::OPERAND)};
-    // ("4/(5^2)+(6^2^3)");
-    //Token expression2 = "1+ 3 * ( 4 + 8 * 3^7)";
-
-    //std::string expression = "A+(B*C-(D/E^F)+G)*H";
-    std::vector <Token> postfix = infix_to_postfix( expression_t );
-    //std::cout << ">>> Input (infix)    = " << expression << "\n";
-    //std::cout << ">>> Output (postfix) = " << postfix << "\n";
-
-    std::cout << expression << std::cout;
-    auto result = evaluate_postfix( postfix );
-    std::cout << ">>> Result is: " << result << std::endl;
-    std::cout << "\n>>> Normal exiting...\n";
-
-    return EXIT_SUCCESS;
-}
 
 std::vector<Token> infix_to_postfix( std::vector<Token> infix_ )
 {
@@ -151,10 +132,7 @@ bool has_higher_precedence( Token op1, Token op2 )
     return p1 >= p2 ;
 }
 
-// value_type char2integer( char ch )
-// {
-//     return ch - '0';
-// }
+
 Parser::input_int_type str_to_int( Token input_tk_ )
 {
     // Creating input stream.
@@ -190,7 +168,7 @@ value_type evaluate_postfix( std::vector<Token> postfix_ )
             // std::cout << "\n>>> Performing " << op1 << " " << tk << " " << op2 << "\n";
             auto result = execute_operator( op1, op2, tk.value );
 
-            std::cout << ">>> The result is: "  << result << std::endl;
+            //std::cout << ">>> The result is: "  << result << std::endl;
             s.push(result);
         }
         else
@@ -216,14 +194,21 @@ value_type execute_operator( value_type n1, value_type n2, std::string opr )
        else if( opr == "/")
        {
             if ( n2 == 0 )
+            {
+                std::cout << "\n >>> Indefinição, divisão por '0'!!!!!!!!!!!!!!!!!!!! <<< \n";
                 throw std::runtime_error( "Division by zero" );
+            }
                    
             result = n1/n2;
        }
        else if(opr == "%")
        {
             if ( n2 == 0 )
+            {
+                std::cout << " >>> Indefinição, divisão por '0' <<< ";
                 throw std::runtime_error( "Division by zero" );
+            }
+               
             
             result = n1%n2;
        }
