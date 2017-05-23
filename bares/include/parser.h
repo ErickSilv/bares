@@ -95,6 +95,9 @@ class Parser
         std::string::iterator it_curr_symb; //<! Pointer to the current char inside the expression.
         std::vector< Token > token_list; //<! Resulting list of tokens extracted from the expression.
 
+        //Prints a result of expression's parsing.
+        void print_msg( const Parser::ParserResult & result, std::string str );
+        
         /// Converte de caractere para código do símbolo terminal.
         terminal_symbol_t lexer( char ) const;
         std::string token_str( terminal_symbol_t s_ ) const;
