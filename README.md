@@ -47,8 +47,10 @@ To compiling this project is necessary access, in terminal, the repository.
 After that write, in terminal, the command : 'make'.
 
 # Running 
-To execute is necessary write the follow command : ' ./parser "archive_list_of_expression_name.*" '  
-> The char '*' refer to any type of text archive.
+To execute is necessary write the follow command :   
+>  ./parser archive_list_of_expression_name.* .
+
+The char '*' refer to a text type of an expression archive. 
 
 # Limitations
 This BARES don't accept more than one unary '-'.
@@ -58,7 +60,7 @@ Only numbers and final results of expression beetwen the range [−32,768, +32,7
 
 Program developed by Erick de Oliveira Silva (<erickoliveira.eos@gmail.com>), graduation student of IT in UFRN.
 
-#CONTRIBUTORS
+# Contributors
 
 In Parser and Token codes has some contribuiton of Selan (selan@dimap.ufrn.br) and students from LP1, 2017.1 with the codes
 writed in LP1 classes.
