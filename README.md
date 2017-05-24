@@ -13,7 +13,7 @@ Information on **recursive descendent parsing** may be found [here](https://en.w
 
 The gramar we want to parse represents arithmetic expressions with addition and subtraction of integers.
 
-    <expr>            := <term>,{ ("+"|"-"),<term> };
+    <expr>            := ("("),<term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term>,(")") };
     <term>            := <integer>;
     <integer>         := 0 | ["-"],<natural_number>;
     <natural_number>  := <digit_excl_zero>,{<digit>};
@@ -22,36 +22,46 @@ The gramar we want to parse represents arithmetic expressions with addition and 
 
 This grammar _accepts_ expressions like:
 
-* "23 + 43 - 0   + -124 - 21"
-* " 21"
-* "-21 +     -18"
+* "13 + 39 - 0   + -14 / 2"
+* " 19"
+* "-11 %     -8"
 * " -54"
-* "-21 - 23 + 1234"
+* "-21 * (23 + 1234)"
+* "3 + 3 * 3 % 4"
+* "(3^5) % 10"
 
 And _rejects_ expressions like:
 
 * "01 + 3"
 * " - 3 + 4"
-* "2 +"
+* "2 + "
 * "  "
-* "+2 + 5"
-* "-02 + 4"
-* "(2+3)" _(for the time being)_
+* "(+2 + 5"
+* "2 + 4)"
+* "2/0" 
+* "1000000000 - 1"
+* ""
 
-Later on we might want to improve this grammar to accept other binary operations and _parenthesis_.
+# Compiling
+To compiling this project is necessary access, in terminal, the repository.
+After that write, in terminal, the command : 'make'.
 
-# TODO
+# Running 
+To execute is necessary write the follow command : ' ./parser "archive_list_of_expression_name.*" '  
+> The char '*' refer to any type of text archive.
 
-- [X] Explain the concepts behind the parsing process.
-- [X] Implement `Parser` class and its basic infrastructure for processing symbols.
-- [ ] Implement the non-terminal production rules.
-- [ ] Test the parsing process.
-- [ ] Implement token extraction.
-- [ ] Expand the grammar to handle a full [BARES](http://projetos.imd.ufrn.br/LP1_20162/bares.git) expression.
+# Limitations
+This BARES don't accept more than one unary '-'.
+Only numbers and final results of expression beetwen the range [−32,768, +32,767] are accepted (The types has been defined in bares.cpp and main.cpp).
 
 # Authorship
 
-Program developed by Selan (<selan@dimap.ufrn.br>) and students from LP1, 2017.1
+Program developed by Erick de Oliveira Silva (<erickoliveira.eos@gmail.com>), graduation student of IT in UFRN.
 
-&copy; DIMAp/UFRN 2016-2017.
+#CONTRIBUTORS
+
+In Parser and Token codes has some contribuiton of Selan (selan@dimap.ufrn.br) and students from LP1, 2017.1 with the codes
+writed in LP1 classes.
+
+&copy; IMD/UFRN 2017.1
 

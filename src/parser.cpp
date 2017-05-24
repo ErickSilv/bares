@@ -1,36 +1,32 @@
 #include "../include/parser.h"
-#include <iterator>
-#include <algorithm>
-
 void Parser::print_msg( const Parser::ParserResult & result, std::string str )
 {
     std::string error_indicator( str.size()+1, ' ');
 
-    std::cout << " >>> ERROR!!!! <<< \n";
     // Have we got a parsing error?
     error_indicator[result.at_col] = '^';
     switch ( result.type )
     {
         case Parser::ParserResult::UNEXPECTED_END_OF_EXPRESSION:
-            std::cout << " >>> Unexpected end of input at column (" << result.at_col << ")!\n";
+            std::cout << "Unexpected end of input at column (" << result.at_col+1 << ")!\n";
             break;
         case Parser::ParserResult::ILL_FORMED_INTEGER:
-            std::cout << " >>> Ill formed integer at column (" << result.at_col << ")!\n";
+            std::cout << "Ill formed integer at column (" << result.at_col+1 << ")!\n";
             break;
         case Parser::ParserResult::MISSING_TERM:
-            std::cout << " >>> Missing <term> at column (" << result.at_col << ")!\n";
+            std::cout << "Missing <term> at column (" << result.at_col+1 << ")!\n";
             break;
         case Parser::ParserResult::EXTRANEOUS_SYMBOL:
-            std::cout << " >>> Extraneous symbol after valid expression found at column (" << result.at_col << ")!\n";
+            std::cout << "Extraneous symbol after valid expression found at column (" << result.at_col+1 << ")!\n";
             break;
         case Parser::ParserResult::MISSING_CLOSING_PARENTHESIS:
-            std::cout << " >>> Missing closing parenthesis \")\" at column (" << result.at_col << ")!\n";
+            std::cout << "Missing closing parenthesis \")\" at column (" << result.at_col+1 << ")!\n";
             break;
         case Parser::ParserResult::INTEGER_OUT_OF_RANGE:
-            std::cout << " >>> Integer constant out of range beginning at column (" << result.at_col << ")!\n";
+            std::cout << "Integer constant out of range beginning at column (" << result.at_col+1 << ")!\n";
             break;
         default:
-            std::cout << " >>> Unhandled error found!\n";
+            std::cout << "Unhandled error found!\n";
             break;
     }
 
@@ -174,10 +170,11 @@ Parser::input_int_type str_to_int( std::string input_str_ )
 /*! Processando uma expressão.
  *
  * Produção:
- * <expr> := <term>,{ ("+"|"-"),<term> }
+ * <expr> := ("("), <term>,{ ("+"|"-"|"*"|"/"|"%"|"^"),<term>,(")") }
  *
  * De acordo com a gramática (acima), uma expressão pode ser apenas um
- * termo isolado ou seguido de um ou mais termos com um + ou - entre eles.
+ * termo isolado ou seguido de um ou mais termos com um dos operadores
+ * entre eles, envoltos ou não entre parenteses.
  *
  */
 Parser::ParserResult Parser::expression()
@@ -288,8 +285,10 @@ Parser::ParserResult Parser::term()
     } 
     else
     {
+        //Valida um inteiro
         result = integer();
 
+        //Trata numeros com mais de um digito.
         std::string num;
         num.insert( num.begin(), begin_token, it_curr_symb );
 
@@ -297,17 +296,17 @@ Parser::ParserResult Parser::term()
             std::string num;
             num.insert(num.begin(), begin_token, it_curr_symb);
 
-            //Testa se num está no limite de required_int_type
+            //Testa se num está no limite de required_int_type e insere no token_list caso esteja dentro do escopo.
             input_int_type value = std::stoll( num );
             if( value <= std::numeric_limits< Parser::required_int_type >::max() 
                 and value >= std::numeric_limits< Parser::required_int_type >::min() ){
-
+            
                 token_list.push_back( 
                            Token( num, Token::token_t::OPERAND ) );
                 
             } else {
                 result.type = ParserResult::INTEGER_OUT_OF_RANGE;
-                result.at_col = std::distance( expr.begin(), begin_token );
+                result.at_col = std::distance( expr.begin(), begin_token );    
             }
         }
     }
@@ -385,13 +384,17 @@ Parser::parse( std::string e_ )
     // Verificação de 'lixo' do final da string
     if ( result.type == ParserResult::PARSER_OK )
     {
+        /*Pula os espaços em branco e verifica se chegou no final da string
+         * se tiver chegado em um caracter que não seja um simbolo e nem o final
+         * da string então é um símbolo estranho.
+         */
         skip_ws();
         if ( not end_input() )
         {
-            std::cout << "\n >>> Expressão mal formada <<< \n";
             return ParserResult( ParserResult::EXTRANEOUS_SYMBOL, 
                     std::distance( expr.begin(), it_curr_symb ) );
-        }
+        } 
+        
         //std::cout << ">>> O que sobrou foi: \"";
         std::copy( it_curr_symb, expr.end(), 
                 std::ostream_iterator<char>( std::cout, " " ) );
@@ -400,16 +403,10 @@ Parser::parse( std::string e_ )
 
     } else {
 
+        //Verify integers iniciated with letters.
         if ( it_curr_symb == expr.begin() )
         {
-            std::cout << "\n >>> Expressão mal formada <<< \n";
             return ParserResult( ParserResult::ILL_FORMED_INTEGER, 
-                    std::distance( expr.begin(), it_curr_symb ) );
-        }
-        else if ( not end_input() )
-        {
-            std::cout << "\n >>> Expressão mal formada <<< \n";
-            return ParserResult( ParserResult::EXTRANEOUS_SYMBOL, 
                     std::distance( expr.begin(), it_curr_symb ) );
         }
     }

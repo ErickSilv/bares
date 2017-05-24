@@ -5,6 +5,8 @@
 #include <iterator> // std::distance()
 #include <vector>   // std::vector
 #include <sstream>  // std::istringstream
+#include <algorithm>
+
 
 #include "token.h"  // struct Token.
 
@@ -33,8 +35,8 @@ class Parser
                     UNEXPECTED_END_OF_EXPRESSION,
                     ILL_FORMED_INTEGER,
                     MISSING_TERM,
-                    MISSING_CLOSING_PARENTHESIS,
                     EXTRANEOUS_SYMBOL,
+                    MISSING_CLOSING_PARENTHESIS,
                     INTEGER_OUT_OF_RANGE
             };
 
@@ -50,7 +52,7 @@ class Parser
         };
 
         //==== Aliases
-        typedef long int required_int_type;
+        typedef short int required_int_type;
         typedef long long int input_int_type;
         //==== Public interface
         /// Recebe uma expressão, realiza o parsing e retorna o resultado.
@@ -69,6 +71,9 @@ class Parser
 
         //Prints a result of expression's parsing.
         void print_msg( const Parser::ParserResult & result, std::string str );
+
+        //Analisys the special case of division by zero.
+        void zero_division_error( void );
 
     private:
         //=== Aliases

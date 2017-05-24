@@ -7,6 +7,10 @@
  */
 #include "../include/bares.h"
 
+/* @brief Converte um vector de Token de sua forma infixa para sua forma posfixa. 
+ * @param infix_ Um vector de Token para ser tranformado.
+ * @return Um vector de Token da forma posfixa da expressao.
+ */
 std::vector<Token> infix_to_postfix( std::vector<Token> infix_ )
 {
     // Stores the postfix expression.
@@ -57,7 +61,8 @@ std::vector<Token> infix_to_postfix( std::vector<Token> infix_ )
 
     // Pop out all the remaining operators in the stack.
     while( not s.empty() )
-    {
+    {   
+        //Addicionate the top of the stack in the back of the vector.
         postfix.push_back( s.top() );
         s.pop();
     }
@@ -132,7 +137,7 @@ bool has_higher_precedence( Token op1, Token op2 )
     return p1 >= p2 ;
 }
 
-
+//Converte a string value do Token em um inteiro.
 Parser::input_int_type str_to_int( Token input_tk_ )
 {
     // Creating input stream.
@@ -148,7 +153,10 @@ Parser::input_int_type str_to_int( Token input_tk_ )
 
     return value;
 }
-
+/* @brief Coloca operadores na pilha de acordo com seu peso e controla o resultado. 
+ * @param postfix_ Um vector de Token para ser avaliado e calculadoo seu valor.
+ * @return Um value_type com o valor final da expressão.
+ */
 value_type evaluate_postfix( std::vector<Token> postfix_ )
 {
     std::stack< value_type > s;
@@ -179,47 +187,54 @@ value_type evaluate_postfix( std::vector<Token> postfix_ )
 
     return s.top();
 }
+/* @brief Aplica um tipo de operação dependendo da entrada e retorna um value_type. 
+ * @param n1 É um número do tipo value_type.
+ * @param n2 É um número do tipo value_type.
+ * @param opr Operação a ser realizada.
+ * @return Um value_type após feita uma operação entre o n1 e n2.
+ */
 value_type execute_operator( value_type n1, value_type n2, std::string opr )
 {
     value_type result(0);
-   
-       if ( opr == "^")
-       {
-           result = static_cast<value_type>( pow( n1, n2 ) );
-       }
-       else if( opr == "*")
-       {
-            result =  n1 * n2;
-       }
-       else if( opr == "/")
-       {
-            if ( n2 == 0 )
-            {
-                std::cout << "\n >>> Indefinição, divisão por '0'!!!!!!!!!!!!!!!!!!!! <<< \n";
-                throw std::runtime_error( "Division by zero" );
-            }
+           
+           // Aplica um tipo de operação dependendo da entrada e retorna um value_type. 
+           if ( opr == "^")
+           {
+               result = static_cast<value_type>( pow( n1, n2 ) );
+           }
+           else if( opr == "*")
+           {
+                result =  n1 * n2;
+           }
+           else if( opr == "/")
+           {
+                if ( n2 == 0 )
+                {
+                    std::cout << "Division by zero!\n";
+                    return 0;
+                }
+                       
+                result = n1/n2;
+           }
+           else if(opr == "%")
+           {
+                if ( n2 == 0 )
+                {
+                    std::cout << "Division by zero!\n";
+                    return 0;
+                }
                    
-            result = n1/n2;
-       }
-       else if(opr == "%")
-       {
-            if ( n2 == 0 )
-            {
-                std::cout << " >>> Indefinição, divisão por '0' <<< ";
-                throw std::runtime_error( "Division by zero" );
-            }
-               
-            
-            result = n1%n2;
-       }
-       else if(opr == "+")
-       {
-            result = n1 + n2;
-       }
-       else if(opr == "-")
-       {
-            result =  n1 - n2;
-       }
+                
+                result = n1%n2;
+           }
+           else if(opr == "+")
+           {
+                result = n1 + n2;
+           }
+           else if(opr == "-")
+           {
+                result =  n1 - n2;
+           }
 
     return result;
 

@@ -14,10 +14,12 @@
 
 
 		/// Simple helper functions.
-		bool is_operator( Token t_ );
-		bool is_operand( Token t_ );
-		bool is_opening_scope( Token t_ );
-		bool is_closing_scope( Token t_ );
+		bool is_operator( Token );
+		bool is_operand( Token );
+		bool is_opening_scope( Token );
+		bool is_closing_scope( Token );
+		bool is_right_association( Token );
+		int get_precedence( Token  );
 
 		/// Determines qhether the first operator is > than the second operator.
 		bool has_higher_precedence( Token op1, Token op2 );
