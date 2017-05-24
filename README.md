@@ -44,7 +44,8 @@ And _rejects_ expressions like:
 
 # Compiling
 To compiling this project is necessary access, in terminal, the repository.
-After that write, in terminal, the command : 'make'.
+After that write, in terminal, the command : 
+> make
 
 # Running 
 To execute is necessary write the follow command :   
